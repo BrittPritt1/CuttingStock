@@ -1,0 +1,98 @@
+﻿@page "/rail-calculator"
+@inject IJSRuntime JS
+
+<h3>Rails Snij-Calculator</h3>
+
+<div class="container">
+    @foreach (var request in requests)
+    {
+        <div class="row mb-2">
+            <div class="col">
+                <input type="number" class="form-control" placeholder="Lengte (m)" @bind="request.Length" />
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" placeholder="Aantal" @bind="request.Amount" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-danger" @onclick="() => requests.Remove(request)">X</button>
+            </div>
+        </div>
+    }
+
+    <button class="btn btn-secondary mt-2" @onclick="AddRow">Rij Toevoegen</button>
+    <button class="btn btn-primary mt-2" @onclick="Calculate">Bereken & Opslaan</button>
+</div>
+
+@if (results.Any())
+{
+    <div id="print-area" class="mt-4 p-3 border">
+        <h4>Resultaat (Rails van 6m)</h4>
+        <p>Totaal aantal rails nodig: <strong>@results.Count</strong></p>
+        <ul>
+            @foreach (var rail in results)
+            {
+                <li>Rail: @string.Join("m + ", rail.Cuts)m (Rest: @Math.Round(rail.Remaining, 2)m)</li>
+            }
+        </ul>
+    </div>
+    <button class="btn btn-success" @onclick="PrintPage">Print Overzicht</button>
+}
+
+@code {
+    private List<CutRequest> requests = new() { new CutRequest() };
+    private List<RailResult> results = new();
+    private const double MaxLength = 6.0;
+
+    private void AddRow() => requests.Add(new CutRequest());
+
+    private void Calculate()
+    {
+        results.Clear();
+        // Maak een platte lijst van alle benodigde stukken (bijv. 3x 2m wordt [2, 2, 2])
+        var allCuts = requests
+            .SelectMany(r => Enumerable.Repeat(r.Length, r.Amount))
+            .OrderByDescending(l => l) // Grotere stukken eerst is efficiënter
+            .ToList();
+
+        foreach (var cut in allCuts)
+        {
+            if (cut > MaxLength) 
+            {
+                // Foutmelding: Stuk is groter dan de hele rail!
+                continue; 
+            }
+
+            // 3. Zoek de eerste rail waar dit stuk nog bij past
+            var fitFound = false;
+            foreach (var rail in results)
+            {
+                // We trekken een kleine marge af (bijv. 0.001) voor zaagblad-dikte (optioneel)
+                if (rail.Remaining >= cut)
+                {
+                    rail.Cuts.Add(cut);
+                    rail.Remaining -= cut;
+                    fitFound = true;
+                    break; // Stop met zoeken voor dit stuk
+                }
+            }
+
+            // 4. Past het nergens? Pak een nieuwe rail van 6 meter
+            if (!fitFound)
+            {
+                results.Add(new RailResult 
+                { 
+                    Cuts = new List<double> { cut }, 
+                    Remaining = MaxLength - cut 
+                });
+            }
+        }
+    }
+
+    private async Task PrintPage() => await JS.InvokeVoidAsync("window.print");
+
+    public class RailResult
+    {
+        public List<double> Cuts { get; set; } = new();
+        public double Remaining { get; set; }
+    }
+}

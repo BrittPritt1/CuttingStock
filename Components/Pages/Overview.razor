@@ -1,0 +1,53 @@
+@page "/overzicht"
+@inject RailService RailServ
+
+<h3>Zaagoverzicht</h3>
+
+@if (!RailServ.LastResults.Any())
+{
+    <p>Geen data gevonden. Ga terug naar de invoerpagina.</p>
+}
+else
+{
+    <div id="print-area">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Aantal</th>
+                    <th>Zaagplan (Lengtes in m)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var groep in GroepeerResultaten())
+                {
+                    <tr>
+                        <td><strong>@groep.Aantal x</strong></td>
+                        <td>@string.Join(" + ", groep.Cuts)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <button class="btn btn-secondary no-print" @onclick='() => Nav.NavigateTo("/input")'>Terug</button>
+}
+
+@code {
+    @inject NavigationManager Nav
+
+    private List<GroupedResult> GroepeerResultaten()
+    {
+        return RailServ.LastResults
+            .GroupBy(r => r.GetKey()) // Groepeer op de unieke combinatie van zaagsnedes
+            .Select(g => new GroupedResult {
+                Aantal = g.Count(),
+                Cuts = g.First().Cuts
+            }).ToList();
+    }
+
+    public class GroupedResult
+    {
+        public int Aantal { get; set; }
+        public List<double> Cuts { get; set; }
+    }
+}

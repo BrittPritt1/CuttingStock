@@ -1,6 +1,7 @@
 using CuttingStockProblem.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<RailService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

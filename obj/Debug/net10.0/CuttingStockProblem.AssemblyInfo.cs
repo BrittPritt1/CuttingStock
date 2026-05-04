@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CuttingStockProblem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b56da53ab7a8b66e37529dbbdfa47c3c03e2d82c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CuttingStockProblem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CuttingStockProblem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,30 @@
+@page "/input"
+@inject RailService RailServ
+@inject NavigationManager Nav
+
+<!-- ... je bestaande input rijen ... -->
+
+<button class="btn btn-primary" @onclick="CalculateAndNavigate">Bereken & Bekijk</button>
+
+@code {
+    private List<CutRequest> requests = new() { new CutRequest() };
+
+    private void CalculateAndNavigate()
+    {
+        var results = new List<RailService.RailResult>();
+        var allCuts = requests
+            .SelectMany(r => Enumerable.Repeat(r.Length, r.Amount))
+            .OrderByDescending(l => l).ToList();
+
+        foreach (var cut in allCuts)
+        {
+            var fit = results.FirstOrDefault(r => r.Remaining >= cut);
+            if (fit != null) { fit.Cuts.Add(cut); fit.Remaining -= cut; }
+            else { results.Add(new RailService.RailResult { Cuts = new() { cut }, Remaining = 6.0 - cut }); }
+        }
+
+        // Sla op in de service en ga naar de volgende pagina
+        RailServ.LastResults = results;
+        Nav.NavigateTo("/overzicht");
+    }
+}
