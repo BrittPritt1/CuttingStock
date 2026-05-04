@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "g0vXj5QsshY=",
+  "success": true,
+  "projectFilePath": "/Users/brittbreugelmans/Documents/School 25-26/CuttingStockProblem/CuttingStockProblem.csproj",
+  "expectedPackageFiles": [
+    "/Users/brittbreugelmans/.nuget/packages/microsoft.aspnetcore.app.internal.assets/10.0.7/microsoft.aspnetcore.app.internal.assets.10.0.7.nupkg.sha512"
+  ],
+  "logs": []
+}
